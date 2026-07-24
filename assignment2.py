@@ -2,7 +2,10 @@
 
 '''
 OPS445 Assignment 2 - Summer 2026
+<<<<<<< ours
 
+=======
+>>>>>>> theirs
 Program: assignment2.py 
 Author: Asia Karki
 The python code in this file is original work written by
@@ -15,7 +18,11 @@ violators will be reported and appropriate action will be taken.
 
 Description: <Enter your documentation here>
 
+<<<<<<< ours
 Date:July 24,2026
+=======
+Date:July 17,2026
+>>>>>>> theirs
 
 '''
 
@@ -52,20 +59,49 @@ def parse_command_args() -> object:
 
     return parser.parse_args()
 
-def percent_to_graph(percent: float, length: int=20) -> str:
-    "turns a percent 0.0 - 1.0 into a bar graph"
-    pass
+def percent_to_graph(percent, total_chars):
+  # Calculate how many '#' characters to display
+    hash_count = int(percent * total_chars)
 
-def get_sys_mem() -> int:
-    "return total system memory (used or available) in kB"
-    # open the meminfo file to do this!
-    pass
+    # The remaining characters will be spaces
+    space_count = total_chars - hash_count
 
-def get_avail_mem() -> int:
-    "return total memory that is currently available"
-    # open the meminfo file to do this!
-    pass
+    # Return the completed graph string
+    return "#" * hash_count + " " * space_count
 
+
+def get_sys_mem():
+# Open the system memory information file
+    with open("/proc/meminfo", "r") as mem_file:
+        for line in mem_file:
+# Find the line containing the total memory
+            if line.startswith("MemTotal:"):
+                parts = line.split()
+   # Return the memory value as an integer
+                return int(parts[1])
+
+
+def get_avail_mem():
+  # Variables used for WSL fallback if MemAvailable is missing
+    mem_free = 0
+    swap_free = 0
+  # Open the system memory information file
+    with open("/proc/meminfo", "r") as mem_file:
+        for line in mem_file:
+# Return MemAvailable if it exists
+            if line.startswith("MemAvailable:"):
+                parts = line.split()
+                return int(parts[1])
+     # Save MemFree value
+            elif line.startswith("MemFree:"):
+                parts = line.split()
+                mem_free = int(parts[1])
+
+            elif line.startswith("SwapFree:"):
+                parts = line.split()
+                swap_free = int(parts[1])
+
+    return mem_free + swap_free
 def pids_of_prog(app_name: str) -> list:
     """Given an app name, return all pids associated with app."""
 
