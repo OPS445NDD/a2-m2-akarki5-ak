@@ -3,7 +3,7 @@
 '''
 OPS445 Assignment 2 - Winter 2023
 Program: assignment2.py 
-Author: "Student Name"
+Author: Asia Karki
 The python code in this file is original work written by
 "Student Name". No code in this file is copied from any other source 
 except those provided by the course instructor, including any person, 
@@ -14,7 +14,7 @@ violators will be reported and appropriate action will be taken.
 
 Description: <Enter your documentation here>
 
-Date: 
+Date:July 24,2026
 
 '''
 
@@ -22,13 +22,34 @@ import argparse
 import os, sys
 
 def parse_command_args() -> object:
-    "Set up argparse here. Call this function inside main."
-    parser = argparse.ArgumentParser(description="Memory Visualiser -- See Memory Usage Report with bar charts",epilog="Copyright 2023")
-    parser.add_argument("-l", "--length", type=int, default=20, help="Specify the length of the graph. Default is 20.")
-    # Create an entry for human-readable. Check the docs to make it a True/False option.
-    parser.add_argument("program", type=str, nargs='?', help="if a program is specified, show memory use of all associated processes. Show only total use if not.")
-    args = parser.parse_args()
-    return args
+    """Set up argparse here. Call this function inside main."""
+    parser = argparse.ArgumentParser(
+        description="Memory Visualiser -- See Memory Usage Report with bar charts",
+        epilog="Copyright 2023"
+    )
+
+    parser.add_argument(
+        "-H",
+        "--human-readable",
+        action="store_true",
+        help="Prints sizes in human readable format"
+    )
+
+    parser.add_argument(
+        "-l",
+        "--length",
+        type=int,
+        default=20,
+        help="Specify the length of the graph. Default is 20."
+    )
+
+    parser.add_argument(
+        "program",
+        nargs="?",
+        help="if a program is specified, show memory use of all associated processes. Show only total use if not."
+    )
+
+    return parser.parse_args()
 
 def percent_to_graph(percent: float, length: int=20) -> str:
     "turns a percent 0.0 - 1.0 into a bar graph"
@@ -45,15 +66,26 @@ def get_avail_mem() -> int:
     pass
 
 def pids_of_prog(app_name: str) -> list:
-    "given an app name, return all pids associated with app"
-    # please use os.popen('pidof <app>') to do this!
-    pass
+    """Given an app name, return all pids associated with app."""
+
+    output = os.popen(f"pidof {app_name}").read().strip()
+
+    if output == "":
+        return []
+
+    return output.split()
 
 def rss_mem_of_pid(proc_id: str) -> int:
-    "given a process id, return the Resident memory used"
-    # for a process, open the smaps file and return the total of each
-    # Rss line.
-    pass
+    """Given a process id, return the Resident memory used."""
+
+    total_rss = 0
+
+    with open(f"/proc/{proc_id}/smaps", "r") as file:
+        for line in file:
+            if line.startswith("Rss:"):
+                total_rss += int(line.split()[1])
+
+    return total_rss
 
 def bytes_to_human_r(kibibytes: int, decimal_places: int=2) -> str:
     "turn 1,024 into 1 MiB, for example"
